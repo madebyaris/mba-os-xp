@@ -1,0 +1,177 @@
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  height: 100%;
+  gap: 16px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.todoPane {
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 18px 35px rgba(217, 138, 89, 0.15);
+}
+
+.todoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+}
+
+.newTaskForm {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.newTaskForm input,
+.newTaskForm select {
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 8px;
+}
+
+.newTaskForm button {
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #ff885b, #ff5e62);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.todoList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.taskItem,
+.taskCompleted {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.taskCompleted {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.taskMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.taskMain label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  border-radius: 999px;
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+}
+
+.taskMeta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #5c5c5c;
+}
+
+.taskActions {
+  display: flex;
+  gap: 8px;
+}
+
+.taskActions button {
+  border-radius: 10px;
+  border: none;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.08);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.timerPane {
+  background: #1c1f2b;
+  border-radius: 18px;
+  padding: 16px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 18px 35px rgba(28, 31, 43, 0.35);
+}
+
+.sessionLabel {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.timerCircle {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 6px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.timerCircle p {
+  font-size: 0.8rem;
+  margin: 6px 0 0;
+}
+
+.timerActions {
+  display: flex;
+  gap: 10px;
+}
+
+.timerActions button {
+  border-radius: 999px;
+  border: none;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.sessionStats {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+

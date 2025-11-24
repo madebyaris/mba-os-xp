@@ -1,0 +1,32 @@
+:root {
+  color-scheme: light;
+  --color-primary: #0054e3;
+  --color-primary-dark: #0e2f73;
+  --color-secondary: #73d216;
+  --color-highlight: #ffdd55;
+  --color-silver: #cbdaf5;
+  --color-window-light: #f8fbff;
+  --color-window-dark: #d6e4ff;
+  --color-border: #5a7bc1;
+  --color-shadow: rgba(12, 34, 78, 0.35);
+  --color-text: #052056;
+  --color-text-muted: #314b83;
+  --desktop-gradient: radial-gradient(circle at 20% 20%, #2f8cff 0%, #0d47a1 55%, #05205a 100%);
+  --font-system: 'Tahoma', 'Segoe UI', sans-serif;
+  --window-radius: 10px;
+  --window-border: 2px solid #ffffff;
+  --menu-height: 38px;
+  --dock-height: 74px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

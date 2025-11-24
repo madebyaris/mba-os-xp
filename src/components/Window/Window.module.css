@@ -1,0 +1,139 @@
+.window {
+  position: absolute;
+  background: #ffffff;
+  border-radius: var(--window-radius);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 45px var(--color-shadow), inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 150ms ease, transform 150ms ease, opacity 150ms ease;
+  animation: windowPop 220ms ease;
+  will-change: transform;
+}
+
+.window.dragging {
+  transition: none;
+  will-change: transform;
+}
+
+.window:focus-visible {
+  outline: 2px solid #ffb347;
+}
+
+.focused {
+  box-shadow:
+    0 25px 55px rgba(8, 26, 58, 0.55),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.minimized {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(45px) scale(0.95);
+}
+
+.titleBar {
+  height: var(--menu-height);
+  background: linear-gradient(180deg, #3a6cd5 0%, #1b49a2 80%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 0 14px;
+  color: #fff;
+  cursor: move;
+  user-select: none;
+}
+
+.titleContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.titleText {
+  font-weight: 700;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+  letter-spacing: 0.02em;
+}
+
+.windowActions {
+  display: flex;
+  gap: 4px;
+}
+
+.actionButton {
+  width: 28px;
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.actionButton:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+.actionButton:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.actionButton:active {
+  transform: scale(0.94);
+}
+
+.minimize {
+  background: linear-gradient(180deg, #8db1ff, #4f7bdb);
+}
+
+.maximize {
+  background: linear-gradient(180deg, #8ce48c, #2fa62f);
+}
+
+.close {
+  background: linear-gradient(180deg, #ff7a7a, #e42323);
+}
+
+.close:hover {
+  background: linear-gradient(180deg, #ffc3c3, #ff3939);
+}
+
+.contentArea {
+  flex: 1;
+  background: #ffffff;
+  padding: 0;
+  overflow: hidden;
+}
+
+.statusBar {
+  height: 28px;
+  background: #eff3ff;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+@keyframes windowPop {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+

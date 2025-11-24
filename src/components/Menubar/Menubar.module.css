@@ -1,0 +1,149 @@
+.menubar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  min-height: var(--menu-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  background: linear-gradient(180deg, #fdfdff, #cedfff);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  font-size: 0.95rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.brandMark {
+  font-size: 1.1rem;
+}
+
+.menuGroup {
+  display: flex;
+  gap: 12px;
+  height: 100%;
+  align-items: stretch;
+}
+
+.menu {
+  position: relative;
+}
+
+.menuButton {
+  height: 100%;
+  padding: 0 12px;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+}
+
+.menuButton:hover,
+.menuButton[aria-expanded='true'] {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.menuDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 10px 30px rgba(15, 30, 80, 0.15);
+  overflow: hidden;
+}
+
+.menuItem {
+  width: 100%;
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuItem:hover:not(:disabled) {
+  background: rgba(52, 120, 246, 0.1);
+}
+
+.menuItem:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.statusArea {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.clock {
+  font-feature-settings: 'tnum' 1;
+}
+
+.windowPalette {
+  position: absolute;
+  top: calc(var(--menu-height) + 8px);
+  right: 24px;
+  width: 260px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  z-index: 12;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.windowPalette header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.windowPalette header button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.windowPalette ul {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.windowPalette li button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: rgba(51, 102, 204, 0.08);
+  cursor: pointer;
+}
+
+.windowPalette li button:hover {
+  background: rgba(51, 102, 204, 0.15);
+}
+

@@ -1,0 +1,153 @@
+.container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  height: 100%;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.calendarPane {
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 35px rgba(31, 63, 136, 0.08);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.controls button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(33, 73, 126, 0.1);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #1c2d55;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: 48px repeat(7, 1fr);
+  text-align: center;
+  font-weight: 600;
+  color: #54617d;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.weekNumberLabel {
+  color: #9aa5c0;
+}
+
+.weeks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.weekRow {
+  display: grid;
+  grid-template-columns: 48px repeat(7, 1fr);
+  gap: 6px;
+  align-items: center;
+}
+
+.weekNumber {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #9aa5c0;
+}
+
+.dayButton {
+  border-radius: 10px;
+  border: none;
+  padding: 10px 0;
+  font-weight: 600;
+  background: rgba(83, 123, 217, 0.08);
+  color: #1c2d55;
+  cursor: pointer;
+}
+
+.dayButton[data-outside='true'] {
+  opacity: 0.4;
+}
+
+.dayButton[data-selected='true'] {
+  background: linear-gradient(180deg, #8ab4ff, #3a6cd5);
+  color: white;
+  box-shadow: 0 8px 15px rgba(58, 108, 213, 0.35);
+}
+
+.dayButton[data-today='true']::after {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffb347;
+  margin: 4px auto 0;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.selectedCard {
+  background: linear-gradient(120deg, #1e3c72, #2a5298);
+  color: white;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.yearPicker {
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 20px 35px rgba(31, 63, 136, 0.08);
+}
+
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.monthButton {
+  border-radius: 8px;
+  border: none;
+  padding: 8px 0;
+  background: rgba(33, 73, 126, 0.08);
+  cursor: pointer;
+  font-weight: 600;
+  color: #1c2d55;
+}
+
+.monthButton[data-active='true'] {
+  background: linear-gradient(160deg, #8ab4ff, #3a6cd5);
+  color: white;
+  box-shadow: 0 8px 15px rgba(58, 108, 213, 0.3);
+}
+
