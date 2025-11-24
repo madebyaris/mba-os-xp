@@ -1,0 +1,927 @@
+---
+alwaysApply: true
+---
+
+# MBA OS - Coding Standards & Best Practices
+
+## Philosophy
+
+This project follows **10X developer principles** with emphasis on:
+- **Type Safety**: Leverage TypeScript's type system to prevent bugs at compile-time
+- **Performance**: Optimize for 60fps animations and minimal bundle size
+- **Maintainability**: Write self-documenting code with clear patterns
+- **Consistency**: Follow established patterns throughout the codebase
+- **Accessibility**: Ensure WCAG AA compliance for all users
+
+---
+
+## TypeScript Standards
+
+### Type Definitions
+
+**ALWAYS** define explicit types for:
+- Function parameters and return types
+- Component props (use interfaces, not types for props)
+- Context values
+- Event handlers
+- API responses
+- State variables (when type can't be inferred)
+
+```typescript
+// ✅ GOOD: Explicit interface for props
+interface WindowProps {
+  window: WindowInstance
+  children: ReactNode
+  onFocus: (id: string) => void
+}
+
+// ❌ BAD: Implicit any types
+function Window({ window, children, onFocus }) { }
+
+// ✅ GOOD: Explicit return type
+const calculatePosition = (x: number, y: number): WindowPosition => {
+  return { x, y }
+}
+
+// ❌ BAD: Implicit return type
+const calculatePosition = (x: number, y: number) => {
+  return { x, y }
+}
+```
+
+### Type Safety Rules
+
+1. **Never use `any`** - Use `unknown` if type is truly unknown, then narrow it
+2. **Use type guards** for runtime type checking
+3. **Prefer `const` assertions** for literal types
+4. **Use branded types** for IDs to prevent mixing different ID types
+5. **Leverage discriminated unions** for state machines
+
+```typescript
+// ✅ GOOD: Type guard
+function isWindowInstance(obj: unknown): obj is WindowInstance {
+  return typeof obj === 'object' && obj !== null && 'id' in obj && 'title' in obj
+}
+
+// ✅ GOOD: Const assertion
+const WINDOW_ACTIONS = ['open', 'close', 'minimize'] as const
+type WindowAction = typeof WINDOW_ACTIONS[number]
+
+// ✅ GOOD: Discriminated union
+type WindowState = 
+  | { type: 'idle' }
+  | { type: 'opening'; windowId: string }
+  | { type: 'closing'; windowId: string }
+```
+
+### Import Organization
+
+Order imports consistently:
+1. React and React-related imports
+2. Third-party libraries
+3. Internal utilities and types
+4. Styles (CSS Modules)
+5. Assets
+
+```typescript
+// ✅ GOOD: Organized imports
+import { memo, useCallback, useState, type ReactNode } from 'react'
+import { Rnd } from 'react-rnd'
+import clsx from 'clsx'
+import { Minus, Square, X } from 'lucide-react'
+
+import type { WindowInstance } from '@/types/window'
+import { cascadePosition } from '@/utils/windowManager'
+
+import styles from './Window.module.css'
+```
+
+---
+
+## React Best Practices
+
+### Component Structure
+
+**ALWAYS** follow this component structure order:
+
+1. Imports (see import organization above)
+2. Type/Interface definitions
+3. Constants (outside component)
+4. Component function
+5. Hooks (in order: useState, useReducer, useContext, useMemo, useCallback, useEffect)
+6. Event handlers
+7. Render logic
+8. Export
+
+```typescript
+// ✅ GOOD: Proper component structure
+import { useState, useCallback } from 'react'
+
+interface CalculatorProps {
+  initialValue?: number
+}
+
+const MAX_DISPLAY_LENGTH = 15
+
+const Calculator = ({ initialValue = 0 }: CalculatorProps) => {
+  // State hooks
+  const [value, setValue] = useState(initialValue)
+  
+  // Memoized values
+  const displayValue = useMemo(() => value.toFixed(2), [value])
+  
+  // Callbacks
+  const handleClick = useCallback((num: number) => {
+    setValue(num)
+  }, [])
+  
+  // Effects
+  useEffect(() => {
+    // side effects
+  }, [])
+  
+  // Render
+  return <div>{displayValue}</div>
+}
+```
+
+### Hooks Rules
+
+1. **ALWAYS** call hooks at the top level - never conditionally
+2. **ALWAYS** include all dependencies in dependency arrays
+3. **USE** `useCallback` for functions passed as props or in dependency arrays
+4. **USE** `useMemo` for expensive computations (not for simple values)
+5. **USE** `useRef` for mutable values that don't trigger re-renders
+
+```typescript
+// ✅ GOOD: Proper hook usage
+const Window = ({ window, onClose }: WindowProps) => {
+  const [isDragging, setIsDragging] = useState(false)
+  const rndRef = useRef<Rnd>(null)
+  
+  const handleDrag = useCallback((data: DragData) => {
+    // Only update state on drag stop, not during drag
+    setIsDragging(false)
+  }, [])
+  
+  const memoizedProps = useMemo(() => ({
+    size: { width: window.size.width, height: window.size.height },
+    position: { x: window.position.x, y: window.position.y },
+  }), [window.size, window.position])
+  
+  useEffect(() => {
+    const handler = () => setIsDragging(false)
+    window.addEventListener('mouseup', handler)
+    return () => window.removeEventListener('mouseup', handler)
+  }, [])
+  
+  return <Rnd ref={rndRef} {...memoizedProps} onDragStop={handleDrag} />
+}
+
+// ❌ BAD: Conditional hooks
+if (condition) {
+  const [state, setState] = useState() // NEVER DO THIS
+}
+
+// ❌ BAD: Missing dependencies
+useEffect(() => {
+  doSomething(value)
+}, []) // Missing 'value' dependency
+```
+
+### Performance Optimization
+
+**ALWAYS** optimize for performance:
+
+1. **Memoize components** that receive stable props
+2. **Memoize callbacks** passed to child components
+3. **Memoize expensive computations**
+4. **Use `React.memo`** for pure components
+5. **Lazy load** application components
+
+```typescript
+// ✅ GOOD: Memoized component
+const WindowComponent = memo(({ window, onClose }: WindowProps) => {
+  // Component implementation
+})
+
+// ✅ GOOD: Memoized callback
+const handleClose = useCallback(() => {
+  onClose(window.id)
+}, [window.id, onClose])
+
+// ✅ GOOD: Memoized expensive computation
+const sortedWindows = useMemo(() => {
+  return [...windows].sort((a, b) => b.zIndex - a.zIndex)
+}, [windows])
+
+// ✅ GOOD: Lazy loading
+const Calculator = lazy(() => import('./apps/Calculator/Calculator'))
+```
+
+### State Management
+
+**PREFER** Context API with `useReducer` for complex state:
+
+1. **USE** `useReducer` for state with multiple sub-values or complex logic
+2. **USE** `useState` for simple, independent state
+3. **KEEP** state as close to where it's used as possible
+4. **AVOID** prop drilling - use Context when needed
+
+```typescript
+// ✅ GOOD: useReducer for complex state
+type WindowAction = 
+  | { type: 'OPEN'; instance: WindowInstance }
+  | { type: 'CLOSE'; id: string }
+  | { type: 'FOCUS'; id: string }
+
+const windowReducer = (state: WindowState, action: WindowAction): WindowState => {
+  switch (action.type) {
+    case 'OPEN':
+      return { ...state, windows: [...state.windows, action.instance] }
+    case 'CLOSE':
+      return { ...state, windows: state.windows.filter(w => w.id !== action.id) }
+    default:
+      return state
+  }
+}
+
+// ✅ GOOD: useState for simple state
+const [isOpen, setIsOpen] = useState(false)
+```
+
+### Event Handlers
+
+**ALWAYS** follow these patterns:
+
+1. **USE** `useCallback` for event handlers passed as props
+2. **PREFIX** handlers with `handle` (e.g., `handleClick`, `handleClose`)
+3. **EXTRACT** complex logic into separate functions
+4. **PREVENT** default behavior explicitly when needed
+
+```typescript
+// ✅ GOOD: Proper event handler pattern
+const handleButtonClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+  event.preventDefault()
+  onAction(id)
+}, [id, onAction])
+
+// ✅ GOOD: Keyboard event handler
+const handleKeyDown = useCallback((event: KeyboardEvent) => {
+  if (event.key === 'Escape') {
+    onClose()
+  }
+}, [onClose])
+```
+
+---
+
+## CSS Modules Standards
+
+### Naming Conventions
+
+**ALWAYS** use BEM-inspired naming:
+
+- **Component**: `.componentName`
+- **Element**: `.componentName__elementName`
+- **Modifier**: `.componentName--modifierName` or `.componentName.isActive`
+- **State**: `.componentName.isDragging`, `.componentName.hasError`
+
+```css
+/* ✅ GOOD: BEM-style naming */
+.window {
+  /* base styles */
+}
+
+.window__titleBar {
+  /* element styles */
+}
+
+.window--maximized {
+  /* modifier styles */
+}
+
+.window.isDragging {
+  /* state styles */
+}
+
+.window__titleBar.isActive {
+  /* nested state */
+}
+```
+
+### CSS Organization
+
+**ALWAYS** organize CSS in this order:
+
+1. Layout properties (display, position, flex, grid)
+2. Box model (width, height, margin, padding, border)
+3. Typography (font, line-height, text-align)
+4. Visual (background, color, opacity)
+5. Effects (box-shadow, transform, transition)
+6. Other (cursor, z-index, overflow)
+
+```css
+/* ✅ GOOD: Organized CSS */
+.window {
+  /* Layout */
+  display: flex;
+  position: absolute;
+  flex-direction: column;
+  
+  /* Box Model */
+  width: 400px;
+  height: 300px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #ccc;
+  
+  /* Typography */
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  
+  /* Visual */
+  background: #ffffff;
+  color: #000000;
+  
+  /* Effects */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
+  
+  /* Other */
+  cursor: default;
+  z-index: 100;
+  overflow: hidden;
+}
+```
+
+### CSS Variables
+
+**USE** CSS custom properties for:
+- Theme colors
+- Spacing scale
+- Typography scale
+- Animation durations
+- Z-index layers
+
+```css
+/* ✅ GOOD: CSS variables */
+:root {
+  --color-primary: #0054e3;
+  --color-secondary: #73d216;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --transition-fast: 150ms;
+  --z-index-menu: 1000;
+  --z-index-modal: 2000;
+}
+
+.window {
+  padding: var(--spacing-md);
+  background: var(--color-primary);
+  transition: transform var(--transition-fast) ease;
+  z-index: var(--z-index-menu);
+}
+```
+
+### Performance
+
+**OPTIMIZE** CSS for performance:
+
+1. **AVOID** expensive selectors (deep nesting, universal selectors)
+2. **USE** `will-change` sparingly and remove after animation
+3. **PREFER** `transform` and `opacity` for animations
+4. **AVOID** layout-triggering properties in animations
+
+```css
+/* ✅ GOOD: Performance-optimized */
+.window {
+  will-change: transform; /* Only during drag */
+  transition: transform 0.2s ease;
+}
+
+.window.isDragging {
+  transition: none; /* Disable during drag */
+}
+
+/* ❌ BAD: Layout-triggering animation */
+.window {
+  transition: width 0.2s ease; /* Triggers layout */
+}
+```
+
+---
+
+## Component Architecture
+
+### Component Organization
+
+**ALWAYS** organize components in this structure:
+
+```
+ComponentName/
+  ├── ComponentName.tsx          # Main component
+  ├── ComponentName.module.css   # Styles
+  ├── ComponentName.test.ts     # Tests (if applicable)
+  ├── index.ts                   # Barrel export
+  └── types.ts                   # Component-specific types (if needed)
+```
+
+### Component Patterns
+
+**USE** these patterns consistently:
+
+1. **Container/Presentational**: Separate logic from presentation
+2. **Compound Components**: For related components (e.g., Window + WindowControls)
+3. **Render Props**: When component needs flexibility
+4. **Custom Hooks**: Extract reusable logic
+
+```typescript
+// ✅ GOOD: Custom hook for reusable logic
+const useWindowDrag = (windowId: string) => {
+  const [isDragging, setIsDragging] = useState(false)
+  const handleDragStart = useCallback(() => setIsDragging(true), [])
+  const handleDragStop = useCallback(() => setIsDragging(false), [])
+  return { isDragging, handleDragStart, handleDragStop }
+}
+
+// ✅ GOOD: Compound component pattern
+<Window>
+  <Window.TitleBar title="Calculator" />
+  <Window.Controls onClose={handleClose} />
+  <Window.Content>
+    <Calculator />
+  </Window.Content>
+</Window>
+```
+
+### Props Interface
+
+**ALWAYS** define clear prop interfaces:
+
+```typescript
+// ✅ GOOD: Clear, well-documented props
+interface WindowProps {
+  /** Unique identifier for the window */
+  window: WindowInstance
+  
+  /** Child components to render inside the window */
+  children: ReactNode
+  
+  /** Callback when window receives focus */
+  onFocus: (id: string) => void
+  
+  /** Callback when window is closed */
+  onClose: (id: string) => void
+  
+  /** Optional custom className */
+  className?: string
+}
+```
+
+---
+
+## Error Handling
+
+### Error Boundaries
+
+**ALWAYS** wrap app sections in Error Boundaries:
+
+```typescript
+// ✅ GOOD: Error boundary implementation
+class AppErrorBoundary extends Component<Props, State> {
+  state = { hasError: false, error: null }
+  
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error }
+  }
+  
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('App Error:', error, errorInfo)
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      return <ErrorFallback error={this.state.error} />
+    }
+    return this.props.children
+  }
+}
+```
+
+### Error Handling Patterns
+
+**ALWAYS** handle errors gracefully:
+
+```typescript
+// ✅ GOOD: Try-catch with fallback
+const loadAudioContext = useCallback(async () => {
+  try {
+    const context = new AudioContext()
+    return context
+  } catch (error) {
+    console.error('Failed to create AudioContext:', error)
+    return null
+  }
+}, [])
+
+// ✅ GOOD: Error state in component
+const [error, setError] = useState<string | null>(null)
+
+if (error) {
+  return <ErrorMessage message={error} onDismiss={() => setError(null)} />
+}
+```
+
+---
+
+## Accessibility (a11y)
+
+### ARIA Attributes
+
+**ALWAYS** include proper ARIA attributes:
+
+```typescript
+// ✅ GOOD: Accessible component
+<button
+  type="button"
+  aria-label="Close window"
+  aria-describedby="window-description"
+  onClick={handleClose}
+>
+  <X aria-hidden="true" />
+</button>
+
+<div id="window-description" className="sr-only">
+  Closes the current window
+</div>
+```
+
+### Keyboard Navigation
+
+**ALWAYS** support keyboard navigation:
+
+```typescript
+// ✅ GOOD: Keyboard support
+const handleKeyDown = useCallback((event: KeyboardEvent) => {
+  if (event.key === 'Escape') {
+    onClose()
+  } else if (event.key === 'Enter' && event.ctrlKey) {
+    onMaximize()
+  }
+}, [onClose, onMaximize])
+
+useEffect(() => {
+  window.addEventListener('keydown', handleKeyDown)
+  return () => window.removeEventListener('keydown', handleKeyDown)
+}, [handleKeyDown])
+```
+
+### Focus Management
+
+**ALWAYS** manage focus properly:
+
+```typescript
+// ✅ GOOD: Focus management
+const focusRef = useRef<HTMLButtonElement>(null)
+
+useEffect(() => {
+  if (isOpen && focusRef.current) {
+    focusRef.current.focus()
+  }
+}, [isOpen])
+```
+
+---
+
+## Performance Best Practices
+
+### Code Splitting
+
+**ALWAYS** lazy load application components:
+
+```typescript
+// ✅ GOOD: Lazy loading
+import { lazy, Suspense } from 'react'
+
+const Calculator = lazy(() => import('./apps/Calculator/Calculator'))
+const Notes = lazy(() => import('./apps/Notes/Notes'))
+
+<Suspense fallback={<LoadingSpinner />}>
+  <Calculator />
+</Suspense>
+```
+
+### Bundle Optimization
+
+**ALWAYS** optimize bundle size:
+
+1. **USE** tree-shaking friendly imports
+2. **AVOID** importing entire libraries
+3. **USE** dynamic imports for heavy dependencies
+4. **ANALYZE** bundle size regularly
+
+```typescript
+// ✅ GOOD: Tree-shakeable imports
+import { Minus, Square, X } from 'lucide-react'
+
+// ❌ BAD: Import entire library
+import * as Icons from 'lucide-react'
+
+// ✅ GOOD: Dynamic import for heavy libraries
+const loadHeavyLibrary = async () => {
+  const module = await import('./heavy-library')
+  return module.default
+}
+```
+
+### Animation Performance
+
+**ALWAYS** optimize animations:
+
+1. **USE** `transform` and `opacity` for animations
+2. **USE** `requestAnimationFrame` for manual animations
+3. **AVOID** layout-triggering properties
+4. **USE** `will-change` sparingly
+
+```typescript
+// ✅ GOOD: Optimized animation
+const animateWindow = useCallback(() => {
+  const start = performance.now()
+  const animate = (currentTime: number) => {
+    const elapsed = currentTime - start
+    const progress = Math.min(elapsed / 200, 1)
+    
+    element.style.transform = `translateY(${progress * 100}px)`
+    
+    if (progress < 1) {
+      requestAnimationFrame(animate)
+    }
+  }
+  requestAnimationFrame(animate)
+}, [])
+```
+
+---
+
+## Testing Standards
+
+### Test Organization
+
+**ALWAYS** write tests for:
+
+1. **Unit tests** for utility functions
+2. **Component tests** for complex components
+3. **Integration tests** for user flows
+4. **E2E tests** for critical paths
+
+```typescript
+// ✅ GOOD: Component test
+import { render, screen, fireEvent } from '@testing-library/react'
+import { Window } from './Window'
+
+describe('Window', () => {
+  it('calls onClose when close button is clicked', () => {
+    const onClose = vi.fn()
+    render(<Window window={mockWindow} onClose={onClose} />)
+    
+    fireEvent.click(screen.getByLabelText('Close window'))
+    
+    expect(onClose).toHaveBeenCalledWith(mockWindow.id)
+  })
+})
+```
+
+---
+
+## Code Quality
+
+### Naming Conventions
+
+**ALWAYS** use clear, descriptive names:
+
+- **Components**: PascalCase (`Window`, `Calculator`)
+- **Functions**: camelCase (`handleClick`, `calculatePosition`)
+- **Constants**: UPPER_SNAKE_CASE (`MAX_WINDOWS`, `MIN_TOP_OFFSET`)
+- **Files**: PascalCase for components (`Window.tsx`), camelCase for utilities (`windowManager.ts`)
+- **CSS Classes**: kebab-case in CSS Modules (handled by CSS Modules)
+
+```typescript
+// ✅ GOOD: Clear naming
+const MAX_WINDOW_COUNT = 10
+const MIN_TOP_OFFSET = 8
+
+const handleWindowClose = (windowId: string) => {
+  // implementation
+}
+
+// ❌ BAD: Unclear naming
+const mwc = 10
+const mto = 8
+const hwc = (id: string) => { }
+```
+
+### Comments
+
+**ALWAYS** write self-documenting code, but add comments for:
+
+1. **Complex algorithms** - Explain the "why", not the "what"
+2. **Business logic** - Explain domain-specific decisions
+3. **Workarounds** - Document temporary fixes and technical debt
+4. **Performance optimizations** - Explain why optimization was needed
+
+```typescript
+// ✅ GOOD: Useful comment
+// Cascade windows diagonally to prevent overlap
+// Each new window is offset by 30px from the previous one
+const cascadePosition = (existingWindows: WindowInstance[]): WindowPosition => {
+  const offset = 30
+  return {
+    x: existingWindows.length * offset,
+    y: existingWindows.length * offset,
+  }
+}
+
+// ❌ BAD: Obvious comment
+// Set the value to 5
+const value = 5
+```
+
+### Code Formatting
+
+**ALWAYS** follow consistent formatting:
+
+1. **USE** 2 spaces for indentation
+2. **USE** single quotes for strings (unless template literals)
+3. **USE** trailing commas in multi-line objects/arrays
+4. **USE** semicolons consistently
+5. **LIMIT** line length to 100 characters
+
+```typescript
+// ✅ GOOD: Consistent formatting
+const config = {
+  width: 400,
+  height: 300,
+  title: 'Calculator',
+}
+
+const message = `Window ${windowId} is ${isOpen ? 'open' : 'closed'}`
+
+// ❌ BAD: Inconsistent formatting
+const config = {width:400,height:300,title:"Calculator"}
+```
+
+---
+
+## Security Best Practices
+
+### Input Validation
+
+**ALWAYS** validate and sanitize inputs:
+
+```typescript
+// ✅ GOOD: Input validation
+const validateWindowSize = (size: unknown): size is WindowSize => {
+  return (
+    typeof size === 'object' &&
+    size !== null &&
+    'width' in size &&
+    'height' in size &&
+    typeof (size as WindowSize).width === 'number' &&
+    typeof (size as WindowSize).height === 'number' &&
+    (size as WindowSize).width > 0 &&
+    (size as WindowSize).height > 0
+  )
+}
+```
+
+### XSS Prevention
+
+**ALWAYS** prevent XSS attacks:
+
+```typescript
+// ✅ GOOD: Safe rendering
+<div>{title}</div> // React automatically escapes
+
+// ❌ BAD: Dangerous innerHTML
+<div dangerouslySetInnerHTML={{ __html: userContent }} />
+```
+
+---
+
+## Git & Version Control
+
+### Commit Messages
+
+**ALWAYS** write clear commit messages:
+
+```
+type(scope): brief description
+
+Detailed explanation if needed
+
+- Bullet point for changes
+- Another bullet point
+```
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
+
+```bash
+# ✅ GOOD: Clear commit message
+feat(window): add drag-to-reorder functionality
+
+- Implement drag handlers with requestAnimationFrame
+- Add visual feedback during drag
+- Optimize performance by updating state only on drag stop
+
+# ❌ BAD: Unclear commit message
+fix stuff
+```
+
+---
+
+## Documentation
+
+### Code Documentation
+
+**ALWAYS** document:
+
+1. **Public APIs** - Functions and components used by others
+2. **Complex logic** - Algorithms and business rules
+3. **Type definitions** - Interfaces and types exported
+
+```typescript
+/**
+ * Creates a new window instance with cascaded position
+ * 
+ * @param options - Window creation options
+ * @param options.appId - Application identifier
+ * @param options.title - Window title
+ * @param options.size - Initial window size (defaults to 400x300)
+ * @returns New window instance
+ * 
+ * @example
+ * ```ts
+ * const window = createWindow({
+ *   appId: 'calculator',
+ *   title: 'Calculator',
+ *   size: { width: 300, height: 400 }
+ * })
+ * ```
+ */
+export const createWindow = (options: CreateWindowOptions): WindowInstance => {
+  // implementation
+}
+```
+
+---
+
+## Checklist for Code Review
+
+Before submitting code, ensure:
+
+- [ ] TypeScript types are explicit and correct
+- [ ] All hooks follow Rules of Hooks
+- [ ] Performance optimizations applied (memo, useMemo, useCallback)
+- [ ] CSS follows naming conventions
+- [ ] Accessibility attributes included
+- [ ] Error handling implemented
+- [ ] Tests written for new functionality
+- [ ] Code is self-documenting with minimal comments
+- [ ] No console.logs or debug code left
+- [ ] Bundle size impact considered
+- [ ] Cross-browser compatibility verified
+
+---
+
+## Quick Reference
+
+### React Patterns
+- **State**: `useState` for simple, `useReducer` for complex
+- **Effects**: `useEffect` with proper cleanup
+- **Memoization**: `useMemo` for values, `useCallback` for functions
+- **Refs**: `useRef` for DOM access or mutable values
+
+### Performance
+- **Components**: `React.memo` for pure components
+- **Code splitting**: `React.lazy` + `Suspense`
+- **Animations**: `transform` + `opacity` only
+- **Bundle**: Tree-shakeable imports
+
+### TypeScript
+- **Types**: Explicit, never `any`
+- **Interfaces**: For object shapes (especially props)
+- **Types**: For unions, intersections, primitives
+- **Guards**: Runtime type checking
+
+### CSS
+- **Naming**: BEM-inspired with CSS Modules
+- **Organization**: Layout → Box → Typography → Visual → Effects
+- **Variables**: Theme values, spacing, timing
+- **Performance**: Transform/opacity for animations
+
+---
+
+**Remember**: Code is read more often than written. Write for your future self and your team.

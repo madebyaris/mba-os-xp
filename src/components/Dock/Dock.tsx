@@ -19,8 +19,6 @@ const Dock = () => {
   const { dockVisible } = useTheme()
   const {
     windows,
-    minimizeAll,
-    restoreAll,
     focusWindow,
     restoreWindow,
   } = useWindows()
@@ -67,34 +65,29 @@ const Dock = () => {
   return (
     <div className={clsx(styles.dockWrapper, { [styles.hidden]: !dockVisible })}>
       <div className={styles.dock}>
-        <button type="button" className={styles.dockAction} onClick={minimizeAll} aria-label="Minimize all windows">
-          🧼
-          <span>Minimize All</span>
-        </button>
         <div className={styles.dockIcons}>
           {apps.map((app) => {
             const info = runningApps.get(app.id) as
               | { count: number; windowId: string; minimized: boolean; lastActiveAt: number }
               | undefined
             return (
-              <button
-                key={app.id}
-                type="button"
-                className={clsx(styles.dockIcon, { [styles.active]: info })}
-                onClick={() => handleAppClick(app.id)}
-                aria-label={`Launch ${app.title}`}
-              >
-                <span className={styles.iconGlyph}>{app.icon}</span>
-                <span className={styles.iconLabel}>{app.title}</span>
-                {info && <span className={clsx(styles.indicator, { [styles.minimized]: info.minimized })} />}
-              </button>
+              <div key={app.id} className={styles.iconContainer}>
+                <button
+                  type="button"
+                  className={clsx(styles.dockIcon, { [styles.active]: info })}
+                  onClick={() => handleAppClick(app.id)}
+                  aria-label={`Launch ${app.title}`}
+                >
+                  <span className={styles.iconGlyph}>{app.icon}</span>
+                  {info && <span className={clsx(styles.indicator, { [styles.minimized]: info.minimized })} />}
+                </button>
+                <div className={styles.iconReflection} aria-hidden="true">
+                  <span className={styles.iconGlyph}>{app.icon}</span>
+                </div>
+              </div>
             )
           })}
         </div>
-        <button type="button" className={styles.dockAction} onClick={restoreAll} aria-label="Restore all windows">
-          🪟
-          <span>Show All</span>
-        </button>
       </div>
     </div>
   )

@@ -100,7 +100,7 @@ const Menubar = () => {
           disabled: !activeWindow,
         },
         {
-          label: 'Exit MBA OS',
+          label: 'Exit MBA OS XP',
           onSelect: closeAllWindows,
         },
       ],
@@ -145,11 +145,11 @@ const Menubar = () => {
       label: 'Help',
       items: [
         {
-          label: 'About MBA OS',
+          label: 'About MBA OS XP',
           onSelect: () =>
             openWindow({
               appId: 'welcome',
-              title: 'About MBA OS',
+              title: 'About MBA OS XP',
               size: { width: 420, height: 280 },
               payload: { purpose: 'about' },
             }),
@@ -179,8 +179,8 @@ const Menubar = () => {
     <>
       <div className={styles.menubar} ref={menubarRef}>
         <div className={styles.brand}>
-          <span className={styles.brandMark}>🪟</span>
-          <span>MBA OS</span>
+          <img src="/windows-xp-logo.png" alt="MBA OS XP" className={styles.brandMark} />
+          <span>MBA OS XP</span>
         </div>
         <nav className={styles.menuGroup}>
           {menus.map((menu) => (

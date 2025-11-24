@@ -15,6 +15,10 @@
   z-index: 0;
 }
 
+.wallpaper[data-wallpaper='bromo'] {
+  background-image: url('/wallpaper/bromo.jpg');
+}
+
 .wallpaper[data-wallpaper='bliss'] {
   background-image: radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.4), transparent 55%),
     linear-gradient(120deg, rgba(66, 185, 122, 0.7), rgba(16, 82, 147, 0.95)),
@@ -117,6 +121,10 @@
   height: 32px;
   border-radius: 8px;
   border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.wallpaperSwatch[data-wallpaper='bromo'] {
+  background: linear-gradient(135deg, #8b5a3c 0%, #d4a574 50%, #4a7c59 100%);
 }
 
 .wallpaperSwatch[data-wallpaper='bliss'] {

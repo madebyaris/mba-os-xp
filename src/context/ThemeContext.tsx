@@ -7,7 +7,7 @@ interface ThemePreferences {
   wallpaper: string
 }
 
-const wallpaperOptions = ['bliss', 'aurora', 'sunset']
+const wallpaperOptions = ['bromo', 'bliss', 'aurora', 'sunset']
 
 interface ThemeContextValue extends ThemePreferences {
   toggleDock: () => void
@@ -17,7 +17,7 @@ interface ThemeContextValue extends ThemePreferences {
 
 const defaultPreferences: ThemePreferences = {
   dockVisible: true,
-  wallpaper: 'bliss',
+  wallpaper: 'bromo',
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
